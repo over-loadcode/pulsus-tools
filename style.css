@@ -39,30 +39,81 @@ textarea {
 	background-color: #1f182b;
 	border: 1px solid #b2b2b2;
 	color: #b2b2b2;
-	font-family: monospace;
 }
 
 .title {
 	text-align: right;
 	margin-right: 20px;
-	width: 350px;
+	width: 18.9em;
 }
 
 h1 {
-	font-size: 50px;
+	font-size: 3em;
 	margin-bottom: 0px;
-	line-height: 55px;
+	line-height: 1.05em;
 }
 
 h2 {
 	margin-top: 0px;
 	font-weight: 300;
 	color: #b2b2b2;
-	font-size: 15px;
-	margin-right: 3px;
+	font-size: 0.9em;
+	width: calc(100% - 0.95em);
+	transition: width 0.79s ease;
 }
 
-form {
+.form-container {
 	padding-left: 20px;
 	border-left: 1px solid #b2b2b2;
+/* 	overflow-wrap: break-word; */
+/* 	width: 40%; */
+	display: flex;
+	align-items: center;
+}
+
+@media only screen and (max-width: 1000px) {
+	body {
+		flex-direction: column;
+		justify-content: flex-start;
+	}
+	.form-container {
+		border-top: 1px solid #b2b2b2;
+		border-left: none;
+		margin-top: 20px;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+}
+
+@media only screen and (max-height: 670px) {
+	body {
+		align-items: flex-start;
+	}
+}
+
+.top-text {
+	text-align: right;
+	width: 4em;
+	transition: width 0.8s ease;
+}
+
+.bottom-text {
+	text-align: right;
+	width: 100%;
+	transition: width 0.8s ease;
+}
+
+h1:hover > .top-text {
+	width: 100%;
+}
+h1:hover > .bottom-text {
+	width: 2em;
+}
+h1:hover + h2 {
+	width: 5.9em;
 }
