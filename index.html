@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width'>
+	<title>replit</title>
+	<link href='style.css' rel='stylesheet' type='text/css' />
+</head>
+
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Inter'>
+
+<body>
+
+	<div class='title'>
+		<h1>PULSUS HORIZONTAL FLIP</h1>
+		<h2>A tool by olc</h2>
+	</div>
+
+	<form>
+		<p><label for='beat'>Enter zt.beat (console command):</label></p>
+		<textarea id='beat' name='beat' rows=10 cols=50></textarea>
+
+		<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
+		<input type='number' id='timestamp_start' name='timestamp_start'>
+
+		<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
+		<input type='number' id='timestamp_end' name='timestamp_end'>
+
+		<br><br>
+		<button type='button' id='button'
+			onclick="flip(document.getElementById('beat').value,document.getElementById('timestamp_start').value,document.getElementById('timestamp_end').value)">FLIP
+			IT</button>
+
+		<p><label for='output'>Output:</label></p>
+		<textarea id='output' name='output' rows=10 cols=50></textarea>
+
+		<p>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</p>
+	</form>
+
+	<script src='script.js'></script>
+
+	<script src='https://replit.com/public/js/replit-badge.js' theme='blue' defer></script>
+</body>
+
+</html>
