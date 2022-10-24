@@ -10,6 +10,7 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 }
 
 p {
@@ -75,6 +76,7 @@ h2 {
 	body {
 		flex-direction: column;
 		justify-content: flex-start;
+		overflow: visible;
 	}
 	.form-container {
 		border-top: 1px solid #b2b2b2;
@@ -93,6 +95,7 @@ h2 {
 @media only screen and (max-height: 670px) {
 	body {
 		align-items: flex-start;
+		overflow: visible;
 	}
 }
 
