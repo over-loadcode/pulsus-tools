@@ -45,7 +45,7 @@ textarea {
 .title {
 	text-align: right;
 	margin-right: 20px;
-	width: 18.9em;
+/* 	width: 18.9rem; */
 }
 
 h1 {
@@ -59,8 +59,11 @@ h2 {
 	font-weight: 300;
 	color: #b2b2b2;
 	font-size: 0.9em;
-	width: calc(100% - 0.95em);
-	transition: width 0.79s ease;
+/* 	width: calc(100% - 0.95em);*/
+	width: 100%;
+	transition: width 0.79s ease-in-out;
+/* 	background-color: red; */
+	white-space: nowrap;
 }
 
 .form-container {
@@ -101,22 +104,24 @@ h2 {
 
 .top-text {
 	text-align: right;
-	width: 4em;
-	transition: width 0.8s ease;
+	width: 0;
+	transition: width 0.8s ease-in-out;
+/* 	background-color: red; */
 }
 
 .bottom-text {
 	text-align: right;
 	width: 100%;
-	transition: width 0.8s ease;
+	transition: width 0.8s ease-in-out;
+/* 	background-color: red; */
 }
 
 h1:hover > .top-text {
 	width: 100%;
 }
 h1:hover > .bottom-text {
-	width: 2em;
+	width: 0;
 }
 h1:hover + h2 {
-	width: 5.9em;
+	width: 0;
 }
