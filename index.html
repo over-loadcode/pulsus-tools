@@ -4,7 +4,7 @@
 <head>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width'>
-	<title>Pulsus Tools</title>
+	<title>replit</title>
 	<link href='style.css' rel='stylesheet' type='text/css' />
 </head>
 
@@ -13,34 +13,38 @@
 <body>
 
 	<div class='title'>
-		<h1>PULSUS HORIZONTAL FLIP</h1>
+		<h1>
+			<div class='top-text'>PULSUS</div> HORIZONTAL <div class='bottom-text'>FLIP</div>
+		</h1>
 		<h2>A tool by olc</h2>
 	</div>
 
-	<form>
-		<p><label for='beat'>Enter zt.beat (console command):</label></p>
-		<textarea id='beat' name='beat' rows=10 cols=50></textarea>
+	<div class='form-container'>
+		<form>
+			<div class='form-element'>
+				<p><label for='beat'>Enter zt.beat (console command):</label></p>
+				<textarea id='beat' name='beat' rows=10 cols=50></textarea>
+				<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
+				<input type='number' id='timestamp_start' name='timestamp_start'>
+				<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
+				<input type='number' id='timestamp_end' name='timestamp_end'>
+				<br><br>
+				<button type='button' id='button'
+					onclick="flip(document.getElementById('beat').value,document.getElementById('timestamp_start').value,document.getElementById('timestamp_end').value)">FLIP
+					IT</button>
 
-		<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
-		<input type='number' id='timestamp_start' name='timestamp_start'>
+				<p><label for='output'>Output:</label></p>
+				<textarea id='output' name='output' rows=10 cols=50></textarea>
+			</div>
 
-		<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
-		<input type='number' id='timestamp_end' name='timestamp_end'>
+			<p>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</p>
+		</form>
+	</div>
 
-		<br><br>
-		<button type='button' id='button'
-			onclick="flip(document.getElementById('beat').value,document.getElementById('timestamp_start').value,document.getElementById('timestamp_end').value)">FLIP
-			IT</button>
-
-		<p><label for='output'>Output:</label></p>
-		<textarea id='output' name='output' rows=10 cols=50></textarea>
-
-		<p>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</p>
-		
-		<p><b>Don't close the tab immediately.<br>If the program doesn't work, you can copy the input field as a backup.</b></p>
-	</form>
-
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 	<script src='script.js'></script>
+
+	<!-- 	<script src='https://replit.com/public/js/replit-badge.js' theme='blue' defer></script> -->
 </body>
 
 </html>
