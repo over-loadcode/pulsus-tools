@@ -78,3 +78,17 @@ function flip(beat, timestamp_start, timestamp_end) {
 	}
 
 }
+
+function transition(item) {
+	const tools = ['blank', 'horizontal-flip', 'color'];
+	tools.forEach(element => {
+		console.log(element);
+		if (element != item) {
+			document.getElementById(element).style.display = 'none';
+		} else {
+			document.getElementById(element).style.display = 'flex';
+		}
+	})
+}
+
+// document.onload = transition(blank);
