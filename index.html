@@ -12,9 +12,13 @@
 
 <body>
 
-	<h2>Pulsus Tools by olc</h2>
 
-	<button id='menu-icon' onclick='showMenu()'></button>
+	<div id='mobile-block'>
+		<p>Pulsus Tools does not currently have mobile support.</p>
+	</div>
+
+
+	<h2>Pulsus Tools by olc</h2>
 
 	<main>
 
@@ -27,10 +31,12 @@
 
 			<div class='title'>
 				<h1><a href='javascript:transition("color");' id='title-color'>
-						<div id='color-text'>COLORING</div>(SOON)
+						<div id='color-text'>COLORING</div>(WIP)
 					</a></h1>
 			</div>
 		</div>
+
+
 
 		<div class='tool-container' id='blank'></div>
 
@@ -39,18 +45,20 @@
 				<form>
 					<div class='form-element'>
 						<p><label for='beat'>Enter zt.beat (console command):</label></p>
-						<textarea id='beat' name='beat' rows=10 cols=50></textarea>
+						<textarea id='flip_beat' name='beat' rows=10 cols=50></textarea>
+
 						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
-						<input type='number' id='timestamp_start' name='timestamp_start'>
+						<input type='number' id='flip_timestamp_start' name='timestamp_start'>
+
 						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
-						<input type='number' id='timestamp_end' name='timestamp_end'>
-						<br>
-						<button type='button' id='button'
-							onclick="flip(document.getElementById('beat').value,document.getElementById('timestamp_start').value,document.getElementById('timestamp_end').value)">FLIP
+						<input type='number' id='flip_timestamp_end' name='timestamp_end'>
+
+						<br><button type='button' id='button'
+							onclick="flip(document.getElementById('flip_beat').value,document.getElementById('flip_timestamp_start').value,document.getElementById('flip_timestamp_end').value)">FLIP
 							IT</button>
 
 						<p><label for='output'>Output:</label></p>
-						<textarea id='output' name='output' rows=10 cols=50></textarea>
+						<textarea id='flip_output' name='output' rows=10 cols=50></textarea>
 					</div>
 
 					<p>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</p>
@@ -66,7 +74,27 @@
 				<form>
 					<div class='form-element'>
 						<p><label for='beat'>Enter zt.beat (console command):</label></p>
-						<textarea id='beat' name='beat' rows=10 cols=50></textarea>
+						<textarea id='color_beat' name='beat' rows=10 cols=50></textarea>
+
+						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
+						<input type='number' id='color_timestamp_start' name='timestamp_start'>
+
+						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
+						<input type='number' id='color_timestamp_end' name='timestamp_end'>
+
+						<p><label for='hex_chord'>2chord hex code:</p>
+						<input type='text' id='color_hex_2chord' name='hex_chord'>
+
+						<p><label for='hex_chord'>3+chord hex code:</p>
+						<input type='text' id='color_hex_3chord' name='hex_chord'>
+
+						<br><button type='button' id='button'
+							onclick="color(document.getElementById('color_beat').value,document.getElementById('color_timestamp_start').value,document.getElementById('color_timestamp_end').value,document.getElementById('color_hex_2chord').value,document.getElementById('color_hex_3chord').value)">ADD
+							COLOR</button>
+
+						<p><label for='output'>Output:</label></p>
+						<textarea id='color_output' name='output' rows=10 cols=50></textarea>
+					</div>
 				</form>
 			</div>
 		</div>
