@@ -120,12 +120,21 @@ h1 {
 	font-weight: 600;
 }
 
+/* h1:hover {
+	color: white;
+} */
+
 p {
 	margin-top: 10px;
 }
 
 a {
 	text-decoration: none;
+	color: #b2b2b2;
+	transition: color 0.4s ease-in-out;
+}
+
+a:hover {
 	color: white;
 }
 
