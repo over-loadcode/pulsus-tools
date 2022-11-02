@@ -69,6 +69,12 @@ textarea {
 	color: #b2b2b2;
 }
 
+input {
+	background-color: #1f182b;
+	border: 1px solid #b2b2b2;
+	color: #b2b2b2;
+}
+
 #timestamp_start, #timestamp_end {
 	background-color: #1f182b;
 	border: 1px solid #b2b2b2;
