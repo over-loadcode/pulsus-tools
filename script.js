@@ -118,10 +118,13 @@ function hex_to_hsv(hex) {
 	var minRGB = Math.min(r, Math.min(g, b));
 	var maxRGB = Math.max(r, Math.max(g, b));
 
+
 	// Black-gray-white
 	if (minRGB == maxRGB) {
-		computedV = minRGB;
-		return [0, 0, computedV];
+		h = 0;
+		s = 0;
+		v = 255 * minRGB;
+		return { h, s, v };
 	}
 
 	// Colors other than black-gray-white:
@@ -142,7 +145,8 @@ function hex_to_hsv(hex) {
 }
 
 // COLORING
-function color(beat, timestamp_start, timestamp_end, hex_2chord, hex_3chord) {
+function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_stream_end) {
+
 
 
 	let setup_data = setup(beat, timestamp_start, timestamp_end);
@@ -155,13 +159,55 @@ function color(beat, timestamp_start, timestamp_end, hex_2chord, hex_3chord) {
 
 	let to_color = [];
 	let chord_counter = 0;
+	let stream_start = false;
+	let jack_start = false;
 	for (i = timestamp_index[0]; i < timestamp_index[1]; i++) {
 
 		if (i != 0) {  // don't check index -1
-			if (beat[i][1] >= beat[i - 1][1] - 0.002 && beat[i][1] <= beat[i - 1][1] + 0.002) {  // check if it's in a 4ms range before or after
+
+
+			// STREAMS
+			if (beat[i][1] < beat[i - 1][1] + 30 / beat[i - 1][9] + 0.002) {  // 1/4 snap away or less
+
+				if (beat[i][0] == beat[i - 1][0]) {
+					jack_start = true;
+					to_color.push([i - 1, 'jack']);
+
+					if (i == beat.length - 1) {  // last item
+						to_color.push([i, 'jack']);
+					}
+				} else {
+					stream_start = true;
+					to_color.push([i - 1, 'stream']);
+
+					if (i == beat.length - 1) {  // last item
+						to_color.push([i, 'stream_end']);
+					}
+				}
+
+				// console.log(String(i - 1) + ' is a stream because ' + String(beat[i][1]) + ' < ' + String(beat[i - 1][1] + 30 / beat[i - 1][9] + 0.002));
+			}
+
+			if (beat[i][0] != beat[i - 1][0] && jack_start) {  // end of jacks
+				if (jack_start == true) {
+					jack_start = false;
+					to_color.push([i - 1, 'jack']);
+					stream_start = false;
+				}
+			}
+
+			if (!(beat[i][1] < beat[i - 1][1] + 30 / beat[i - 1][9] + 0.002) && stream_start == true) {
+				stream_start = false;
+				to_color.push([i - 1, 'stream_end']);
+			}
+
+
+			// CHORD
+			if (beat[i][1] >= beat[i - 1][1] - 0.008 && beat[i][1] <= beat[i - 1][1] + 0.008) {  // check if it's in a 4ms range before or after previous note
 				chord_counter += 1;
 			}
-			if ((!(beat[i][1] >= beat[i - 1][1] - 0.002 && beat[i][1] <= beat[i - 1][1] + 0.002) || i == beat.length - 1) && chord_counter > 0) {
+
+			if ((!(beat[i][1] >= beat[i - 1][1] - 0.008 && beat[i][1] <= beat[i - 1][1] + 0.008) || i == beat.length - 1) && chord_counter > 0) {  // pushing notes to chord when "chord streak" is broken
 
 				if (i == beat.length - 1) {  // last item
 					for (j = 0; j <= chord_counter; j++) {
@@ -182,22 +228,61 @@ function color(beat, timestamp_start, timestamp_end, hex_2chord, hex_3chord) {
 	}
 
 
-	hsv_2chord = hex_to_hsv(hex_2chord);
-	hsv_3chord = hex_to_hsv(hex_3chord);
+	let hsv_default = hex_to_hsv(hex_default);
+	let hsv_2chord = hex_to_hsv(hex_2chord);
+	let hsv_3chord = hex_to_hsv(hex_3chord);
+	let hsv_jack = hex_to_hsv(hex_jack);
+	let hsv_stream = hex_to_hsv(hex_stream);
+	let hsv_stream_end = hex_to_hsv(hex_stream_end);
 
-	console.log(to_color);
+
+
+	if (hsv_stream_end == undefined) {
+		hsv_stream_end = hsv_stream;
+	}
+
+	if (hsv_default != undefined) {
+		beat.map(element => {
+			element[11] = hsv_default.h;
+			element[16] = hsv_default.s;
+			element[17] = hsv_default.v;
+		})
+	}
+
 	to_color.map(element => {
+
 		switch (element[1]) {
 			case 'chord':
 				if (element[2] == 2 && hsv_2chord != undefined) {
 					beat[element[0]][11] = hsv_2chord.h;
 					beat[element[0]][16] = hsv_2chord.s;
-					beat[element[0]][17] = hsv_2chord.s;
+					beat[element[0]][17] = hsv_2chord.v;
 				} else if (element[2] >= 3 && hsv_3chord != undefined) {
 					beat[element[0]][11] = hsv_3chord.h;
 					beat[element[0]][16] = hsv_3chord.s;
-					beat[element[0]][17] = hsv_3chord.s;
+					beat[element[0]][17] = hsv_3chord.v;
 				}
+			case 'jack':
+				if (hsv_jack != undefined) {
+					beat[element[0]][11] = hsv_jack.h;
+					beat[element[0]][16] = hsv_jack.s;
+					beat[element[0]][17] = hsv_jack.v;
+				}
+				break
+			case 'stream':
+				if (hsv_stream != undefined) {
+					beat[element[0]][11] = hsv_stream.h;
+					beat[element[0]][16] = hsv_stream.s;
+					beat[element[0]][17] = hsv_stream.v;
+				}
+				break
+			case 'stream_end':
+				if (hsv_stream_end != undefined) {
+					beat[element[0]][11] = hsv_stream_end.h;
+					beat[element[0]][16] = hsv_stream_end.s;
+					beat[element[0]][17] = hsv_stream_end.v;
+				}
+
 		}
 	})
 
