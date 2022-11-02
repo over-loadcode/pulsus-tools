@@ -29,6 +29,10 @@ h2 {
 	font-size: 1em;
 }
 
+input[type='text'] {
+	width: 100px;
+}
+
 
 #menu-container {
 	height: 100%;
@@ -75,12 +79,6 @@ input {
 	color: #b2b2b2;
 }
 
-#timestamp_start, #timestamp_end {
-	background-color: #1f182b;
-	border: 1px solid #b2b2b2;
-	color: #b2b2b2;
-}
-
 
 button {
 	width: 100%;
@@ -108,7 +106,7 @@ button:active {
 
 
 #color-text {
-	transition: color 0.8s ease;
+	transition: color 0.3s ease;
 }
 
 #title-color:hover > #color-text {
@@ -126,12 +124,21 @@ h1 {
 	font-weight: 600;
 }
 
+/* h1:hover {
+	color: white;
+} */
+
 p {
 	margin-top: 10px;
 }
 
 a {
 	text-decoration: none;
+	color: #b2b2b2;
+	transition: color 0.4s ease-in-out;
+}
+
+a:hover {
 	color: white;
 }
 
@@ -171,4 +178,15 @@ a {
 }
 #color {
 	display: none;
+}
+
+
+.inline-container {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.inline-container > div {
+	width: 110px;
+/* 	margin-right: 10px; */
 }
