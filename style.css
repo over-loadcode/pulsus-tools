@@ -29,10 +29,6 @@ h2 {
 	font-size: 1em;
 }
 
-input {
-	width: 100px;
-}
-
 
 #menu-container {
 	height: 100%;
@@ -73,7 +69,7 @@ textarea {
 	color: #b2b2b2;
 }
 
-input {
+#timestamp_start, #timestamp_end {
 	background-color: #1f182b;
 	border: 1px solid #b2b2b2;
 	color: #b2b2b2;
@@ -106,7 +102,7 @@ button:active {
 
 
 #color-text {
-	transition: color 0.3s ease;
+	transition: color 0.8s ease;
 }
 
 #title-color:hover > #color-text {
@@ -124,47 +120,50 @@ h1 {
 	font-weight: 600;
 }
 
-/* h1:hover {
-	color: white;
-} */
-
 p {
 	margin-top: 10px;
 }
 
 a {
 	text-decoration: none;
-	color: #b2b2b2;
-	transition: color 0.4s ease-in-out;
-}
-
-a:hover {
 	color: white;
 }
 
 
-#mobile-block {
-	z-index: 1;
-	background-color: #0f0c15;
-
-	width: 100%;
-	height: 100%;
-
-	position: absolute;
-	
+#menu-icon {
+	position: fixed;
 	display: none;
+	height: 50px;
+	width: 50px;
+	background-color: gray;
+	
+	left: 15px;
+	top: 15px;
+
+	margin: 0;
+
+	z-index: 1;
 }
 
 @media only screen and (max-width: 760px) {
 
-	#mobile-block {
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	#menu-icon {
+		display: block;
 	}
-
-	h2 {
-		display: none;
+	
+	#menu-container {
+		display: block;
+		position: absolute;
+		width: 15em;
+		left: 0;
+		height: 100%;
+		
+		background-color: blue;
+/* 		left: -15em; */
+	}
+	
+	.form-container {
+		padding-left: 0;
 	}
 	
 }
@@ -178,15 +177,4 @@ a:hover {
 }
 #color {
 	display: none;
-}
-
-
-.inline-container {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.inline-container > div {
-	width: 110px;
-/* 	margin-right: 10px; */
 }
