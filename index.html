@@ -76,25 +76,58 @@
 						<p><label for='beat'>Enter zt.beat (console command):</label></p>
 						<textarea id='color_beat' name='beat' rows=10 cols=50></textarea>
 
-						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
+						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</label>
+						</p>
 						<input type='number' id='color_timestamp_start' name='timestamp_start'>
 
-						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
+						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</label></p>
 						<input type='number' id='color_timestamp_end' name='timestamp_end'>
 
-						<p><label for='hex_chord'>2chord hex code:</p>
-						<input type='text' id='color_hex_2chord' name='hex_chord'>
+						<div class='inline-container'>
+							<div>
+								<p><label for='default'>Default:</label></p>
+								<input type='text' id='color_default' name='default'>
+							</div>
 
-						<p><label for='hex_chord'>3+chord hex code:</p>
-						<input type='text' id='color_hex_3chord' name='hex_chord'>
+							<div>
+								<p><label for='hex_chord'>2chords:</label></p>
+								<input type='text' id='color_hex_2chord' name='hex_chord'>
+							</div>
 
-						<br><button type='button' id='button'
-							onclick="color(document.getElementById('color_beat').value,document.getElementById('color_timestamp_start').value,document.getElementById('color_timestamp_end').value,document.getElementById('color_hex_2chord').value,document.getElementById('color_hex_3chord').value)">ADD
+							<div>
+								<p><label for='hex_chord'>3+chords:</label></p>
+								<input type='text' id='color_hex_3chord' name='hex_chord'>
+							</div>
+
+							<div>
+								<p><label for='jack'>Jacks:</label></p>
+								<input type='text' id='color_jack' name='jack'>
+							</div>
+
+							<div>
+								<p><label for='stream'>Streams:</label></p>
+								<input type='text' id='color_stream' name='stream'>
+							</div>
+
+							<div>
+								<p><label for='stream_end'>Stream ends:</label></p>
+								<input type='text' id='color_stream_end' name='stream_end'>
+							</div>
+						</div>
+
+						<p><label for='double_bpm'>Double BPM: </label><input type='checkbox' id='is_double_bpm'
+								name='double_bpm'></p>
+
+						<button type='button' id='button'
+							onclick="color(document.getElementById('color_beat').value,document.getElementById('color_timestamp_start').value,document.getElementById('color_timestamp_end').value,document.getElementById('color_default').value,document.getElementById('color_hex_2chord').value,document.getElementById('color_hex_3chord').value,document.getElementById('color_jack').value,document.getElementById('color_stream').value,document.getElementById('color_stream_end').value)">ADD
 							COLOR</button>
 
 						<p><label for='output'>Output:</label></p>
 						<textarea id='color_output' name='output' rows=10 cols=50></textarea>
 					</div>
+
+					<p>All color inputs are hex codes.</p>
+
 				</form>
 			</div>
 		</div>
