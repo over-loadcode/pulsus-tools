@@ -18,7 +18,7 @@
 	</div>
 
 
-	<h2>Pulsus Tools by olc</h2>
+	<h2 id='watermark'>Pulsus Tools by olc</h2>
 
 	<main>
 
@@ -31,8 +31,21 @@
 
 			<div class='title'>
 				<h1><a href='javascript:transition("color");' id='title-color'>
-						<div id='color-text'>COLORING</div>(WIP)
+						<div id='color-text'>COLORING</div>
 					</a></h1>
+			</div>
+
+			<div class='title'>
+				<h1><a href='javascript:transition("delete");' id='title-delete'>DELETE<br>
+						<div id='delete-text'>SECTION</div>
+					</a></h1>
+			</div>
+
+			<div id='instructions'>
+				<h2>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</h2>
+				<h2>Don't close the tab immediately.<br>In case the program doesn't work, you can use the input field as
+					a
+					backup.</h2>
 			</div>
 		</div>
 
@@ -47,11 +60,11 @@
 						<p><label for='beat'>Enter zt.beat (console command):</label></p>
 						<textarea id='flip_beat' name='beat' rows=10 cols=50></textarea>
 
-						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</p>
-						<input type='number' id='flip_timestamp_start' name='timestamp_start'>
+						<p><label for='timestamp_start'>Starting timestamp (e.g. 0:00:000, leave blank for none):</p>
+						<input type='text' class='timestamp' id='flip_timestamp_start' name='timestamp_start'>
 
-						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</p>
-						<input type='number' id='flip_timestamp_end' name='timestamp_end'>
+						<p><label for='timestamp_end'>Ending timestamp (e.g. 0:00:000, leave blank for none):</p>
+						<input type='text' class='timestamp' id='flip_timestamp_end' name='timestamp_end'>
 
 						<br><button type='button' id='button'
 							onclick="flip(document.getElementById('flip_beat').value,document.getElementById('flip_timestamp_start').value,document.getElementById('flip_timestamp_end').value)">FLIP
@@ -60,11 +73,6 @@
 						<p><label for='output'>Output:</label></p>
 						<textarea id='flip_output' name='output' rows=10 cols=50></textarea>
 					</div>
-
-					<p>To update chart, enter <u>zt.beat = [output text here]</u> in the console.</p>
-					<p><b>Don't close the tab immediately.<br>In case the program doesn't work, you can use the input
-							field
-							as a backup.</b></p>
 				</form>
 			</div>
 		</div>
@@ -76,42 +84,44 @@
 						<p><label for='beat'>Enter zt.beat (console command):</label></p>
 						<textarea id='color_beat' name='beat' rows=10 cols=50></textarea>
 
-						<p><label for='timestamp_start'>Starting timestamp (milliseconds, leave blank for none):</label>
+						<p><label for='timestamp_start'>Starting timestamp (e.g. 0:00:000, leave blank for
+								none):</label>
 						</p>
-						<input type='number' id='color_timestamp_start' name='timestamp_start'>
+						<input type='text' class='timestamp' id='color_timestamp_start' name='timestamp_start'>
 
-						<p><label for='timestamp_end'>Ending timestamp (milliseconds, leave blank for none):</label></p>
-						<input type='number' id='color_timestamp_end' name='timestamp_end'>
+						<p><label for='timestamp_end'>Ending timestamp (e.g. 0:00:000, leave blank for none):</label>
+						</p>
+						<input type='text' class='timestamp' id='color_timestamp_end' name='timestamp_end'>
 
 						<div class='inline-container'>
 							<div>
 								<p><label for='default'>Default:</label></p>
-								<input type='text' id='color_default' name='default'>
+								<input type='color' id='color_default' name='default'>
 							</div>
 
 							<div>
 								<p><label for='hex_chord'>2chords:</label></p>
-								<input type='text' id='color_hex_2chord' name='hex_chord'>
+								<input type='color' id='color_hex_2chord' name='hex_chord'>
 							</div>
 
 							<div>
 								<p><label for='hex_chord'>3+chords:</label></p>
-								<input type='text' id='color_hex_3chord' name='hex_chord'>
+								<input type='color' id='color_hex_3chord' name='hex_chord'>
 							</div>
 
 							<div>
 								<p><label for='jack'>Jacks:</label></p>
-								<input type='text' id='color_jack' name='jack'>
+								<input type='color' id='color_jack' name='jack'>
 							</div>
 
 							<div>
 								<p><label for='stream'>Streams:</label></p>
-								<input type='text' id='color_stream' name='stream'>
+								<input type='color' id='color_stream' name='stream'>
 							</div>
 
 							<div>
 								<p><label for='stream_end'>Stream ends:</label></p>
-								<input type='text' id='color_stream_end' name='stream_end'>
+								<input type='color' id='color_stream_end' name='stream_end'>
 							</div>
 						</div>
 
@@ -126,8 +136,32 @@
 						<textarea id='color_output' name='output' rows=10 cols=50></textarea>
 					</div>
 
-					<p>All color inputs are hex codes.</p>
+					<p>Black input is a blank input, and the color of those notes will not be changed.</p>
 
+				</form>
+			</div>
+		</div>
+
+		<div class='tool-container' id='delete'>
+			<div class='form-container'>
+				<form>
+					<div class='form-element'>
+						<p><label for='beat'>Enter zt.beat (console command):</label></p>
+						<textarea id='delete_beat' name='beat' rows=10 cols=50></textarea>
+
+						<p><label for='timestamp_start'>Starting timestamp (e.g. 0:00:000, leave blank for none):</p>
+						<input type='text' class='timestamp' id='delete_timestamp_start' name='timestamp_start'>
+
+						<p><label for='timestamp_end'>Ending timestamp (e.g. 0:00:000, leave blank for none):</p>
+						<input type='text' class='timestamp' id='delete_timestamp_end' name='timestamp_end'>
+
+						<br><button type='button' id='button'
+							onclick="delete_section(document.getElementById('delete_beat').value,document.getElementById('delete_timestamp_start').value,document.getElementById('delete_timestamp_end').value)">DELETE
+							THIS</button>
+
+						<p><label for='output'>Output:</label></p>
+						<textarea id='delete_output' name='output' rows=10 cols=50></textarea>
+					</div>
 				</form>
 			</div>
 		</div>
