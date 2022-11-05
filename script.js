@@ -25,9 +25,14 @@ function setup(beat, timestamp_start, timestamp_end) {
 		}
 
 
-		// ms to s conversion
-		timestamp_start = timestamp_start / 1000;
-		timestamp_end = timestamp_end / 1000;
+		// timestamp to s conversion
+		let a = timestamp_start.split(/[:.]+/).map(element => Number(element));  // split by either : or .
+		console.log(a);
+		timestamp_start = a[0] * 60 + a[1] + a[2] * 0.001;
+		a = timestamp_end.split(/[:.]+/).map(element => Number(element));
+		timestamp_end = a[0] * 60 + a[1] + a[2] * 0.001;
+
+		console.log(timestamp_start, timestamp_end);
 
 		beat.sort((a, b) => a[1] - b[1]);  // sort beat by time, which is zt.beat[i][1]
 
@@ -171,7 +176,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 		// STREAM
 		if (i != beat.length - 1) {
 
-			if (beat[i + 1][1] - beat[i][1] < ONE_FOURTH_RHYTHM_COEFFICIENT / beat[i][9] + 0.008 && beat[i + 1][1] - beat[i][1] > 0.008 && beat[i + 1][0] != beat[i][0] && beat[i - 1][0] != beat[i][0]) {
+			if (beat[i + 1][1] - beat[i][1] < ONE_FOURTH_RHYTHM_COEFFICIENT / beat[i][9] + 0.008 && beat[i + 1][1] - beat[i][1] > 0.008 && beat[i + 1][0] != beat[i][0] && beat[i - 1][0] != beat[i][0]) {  // within 1/4 rhythm of next note + 4ms, not in the same position, not on the same tick as the note before or after
 				on_stream = true;
 				to_color.push([i, 'stream']);
 			}
@@ -179,11 +184,11 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 			if (!(beat[i + 1][1] - beat[i][1] < ONE_FOURTH_RHYTHM_COEFFICIENT / beat[i][9] + 0.008 && beat[i + 1][1] - beat[i][1] > 0.008 && beat[i + 1][0] != beat[i][0]) && on_stream) {
 				on_stream = false;
 				to_color.push([i, 'stream_end']);
-			}
+			}  // not within 1/4 rhythm of next note + 4ms, not in the same position, currently in stream. must be end of stream
 
 		} else {
 
-			if (on_stream) {
+			if (on_stream) {  // last note
 				to_color.push([i, 'stream_end']);
 			}
 
@@ -255,9 +260,9 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 
 		switch (element[1]) {
 			case 'chord':
-				if (element[2] == 2 && hsv_2chord != undefined) {
+				if (element[2] == 2) {
 					set_object_color(beat, element, hsv_2chord);
-				} else if (element[2] >= 3 && hsv_3chord != undefined) {
+				} else if (element[2] >= 3) {
 					set_object_color(beat, element, hsv_3chord);
 				}
 				break
@@ -289,8 +294,27 @@ function set_object_color(beat, element, hsv) {  // element refers to elements i
 }
 
 
+// DELETE
+function delete_section(beat, timestamp_start, timestamp_end) {
+	let setup_data = setup(beat, timestamp_start, timestamp_end);
+
+	beat = setup_data.beat;
+	let timestamp_index = setup_data.timestamp_index;
+
+	if (timestamp_index[1] == beat.length - 1) {  // querk of splice IG
+		beat.splice(timestamp_index[0], timestamp_index[1] - timestamp_index[0] + 1);  // its really just so easy for a guy like me
+	} else {
+		beat.splice(timestamp_index[0], timestamp_index[1] - timestamp_index[0]);  // its really just so easy for a guy like me
+	}
+
+
+	let output = JSON.stringify(beat);
+	document.getElementById('delete_output').innerHTML = output;
+}
+
+
 function transition(item) {
-	const tools = ['blank', 'horizontal-flip', 'color'];
+	const tools = ['blank', 'horizontal-flip', 'color', 'delete'];
 	tools.forEach(element => {
 		if (element != item) {
 			document.getElementById(element).style.display = 'none';
@@ -301,3 +325,7 @@ function transition(item) {
 }
 
 // document.onload = transition(blank);
+
+// $(document).on('change', 'input[type=color]', function() {
+// 	this.parentNode.style.backgroundColor = this.value;
+// });
