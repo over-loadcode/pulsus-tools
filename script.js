@@ -105,6 +105,10 @@ function hex_to_hsv(hex) {
 		return;
 	}
 
+	if (hex == '000000') {
+		return undefined;
+	}
+
 	r = parseInt(hex.substr(0, 2), 16);
 	g = parseInt(hex.substr(2, 2), 16);
 	b = parseInt(hex.substr(4, 2), 16);
@@ -129,7 +133,9 @@ function hex_to_hsv(hex) {
 		h = 0;
 		s = 0;
 		v = 255 * minRGB;
+
 		return { h, s, v };
+
 	}
 
 	// Colors other than black-gray-white:
@@ -151,6 +157,7 @@ function hex_to_hsv(hex) {
 
 // COLORING
 function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_stream_end) {
+
 
 	const is_double_bpm = document.getElementById('is_double_bpm');
 
@@ -239,7 +246,6 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	let hsv_jack = hex_to_hsv(hex_jack);
 	let hsv_stream = hex_to_hsv(hex_stream);
 	let hsv_stream_end = hex_to_hsv(hex_stream_end);
-
 
 	console.log(to_color);
 
