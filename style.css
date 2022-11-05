@@ -20,18 +20,46 @@ main {
 	justify-content: center;
 }
 
-h2 {
-	position: fixed;
-	bottom: 5px;
-	right: 5px;
 
+h2 {
 	font-weight: 200;
 	font-size: 1em;
 }
 
-input[type='text'] {
-	width: 100px;
+#watermark {
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
 }
+
+#instructions {
+	position: fixed;
+	bottom: 5px;
+	left: 5px;
+	width: 35%;
+}
+
+
+input[type='color'] {
+	width: calc(100% - 12px);
+	height: 27px;
+	margin-top: 3px;
+	background-color: black !important;
+/* 	display: none; */
+}
+
+input[type="color" i] {
+	padding: 0;
+}
+
+/* .color_wrapper {
+	width: 100px;
+	height: 27px;
+	margin-top: 3px;
+	
+	background-color: black;
+	border: 1px solid #b2b2b2;
+} */
 
 
 #menu-container {
@@ -81,7 +109,7 @@ input {
 
 
 button {
-	width: 100%;
+	width: 392px;
 	margin-top: 15px;
 	height: 40px;
 	font-size: 1rem;
@@ -113,6 +141,14 @@ button:active {
 	color: #9582ff;
 }
 
+#delete-text {
+	transition: color 0.3s ease;
+}
+
+#title-delete:hover > #delete-text {
+	color: #242b33;
+}
+
 
 textarea, input {
 	font-family: monospace;
@@ -135,7 +171,7 @@ p {
 a {
 	text-decoration: none;
 	color: #b2b2b2;
-	transition: color 0.4s ease-in-out;
+	transition: color 0.3s ease;
 }
 
 a:hover {
@@ -177,6 +213,9 @@ a:hover {
 	display: none;
 }
 #color {
+	display: none;
+}
+#delete {
 	display: none;
 }
 
