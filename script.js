@@ -1,3 +1,27 @@
+function timestamp_to_ms(timestamp) {
+
+	a = timestamp.split(/[:.]+/).map(element => Number(element));  // split by either : or .
+
+	var minutes;
+	var seconds;
+	var milliseconds;
+
+	if (a.length == 3) {
+		minutes = a[0];
+		seconds = a[1];
+		milliseconds = a[2];
+	} else if (a.length == 2) {
+		minutes = 0;
+		seconds = a[0];
+		milliseconds = a[1];
+	} else {
+		return undefined;
+	}
+
+	return minutes * 60 + seconds + milliseconds * 0.001;
+
+}
+
 function setup(beat, timestamp_start, timestamp_end) {
 	if (beat != '') {
 
@@ -26,11 +50,8 @@ function setup(beat, timestamp_start, timestamp_end) {
 
 
 		// timestamp to s conversion
-		let a = timestamp_start.split(/[:.]+/).map(element => Number(element));  // split by either : or .
-		console.log(a);
-		timestamp_start = a[0] * 60 + a[1] + a[2] * 0.001;
-		a = timestamp_end.split(/[:.]+/).map(element => Number(element));
-		timestamp_end = a[0] * 60 + a[1] + a[2] * 0.001;
+		timestamp_start = timestamp_to_ms(timestamp_start);
+		timestamp_end = timestamp_to_ms(timestamp_end);
 
 		console.log(timestamp_start, timestamp_end);
 
@@ -154,6 +175,7 @@ function hex_to_hsv(hex) {
 	return { h, s, v };
 
 }
+
 
 // COLORING
 function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_stream_end) {
