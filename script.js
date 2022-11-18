@@ -177,8 +177,13 @@ function hex_to_hsv(hex) {
 }
 
 
+function in_range(x, min, max) {
+	return x >= min && x <= max;
+}
+
+
 // COLORING
-function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_stream_end) {
+function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_stream_end, hex_third, hex_eighth) {
 
 
 	const is_double_bpm = document.getElementById('is_double_bpm');
@@ -199,18 +204,28 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	let to_color = [];
 	let chord_counter = 0;
 	let on_stream = false;
+	var gap;
 	for (i = timestamp_index[0]; i < timestamp_index[1]; i++) {
 
 
 		// STREAM
-		if (i != beat.length - 1) {
+		if (i != beat.length - 1 && i != 0) {
 
-			if (beat[i + 1][1] - beat[i][1] < ONE_FOURTH_RHYTHM_COEFFICIENT / beat[i][9] + 0.008 && beat[i + 1][1] - beat[i][1] > 0.008 && beat[i + 1][0] != beat[i][0] && beat[i - 1][0] != beat[i][0]) {  // within 1/4 rhythm of next note + 4ms, not in the same position, not on the same tick as the note before or after
+			gap = (beat[i + 1][1] - beat[i][1]) * beat[i][9] * 0.008333;
+
+			console.log(i);
+			if (in_range(gap, 0.23, 0.27)
+				&& beat[i + 1][0] != beat[i][0]
+				&& beat[i - 1][0] != beat[i][0]) {  // within 1/4 rhythm of next note + 4ms, not in the same position, not on the same tick as the note before or after
 				on_stream = true;
 				to_color.push([i, 'stream']);
 			}
 
-			if (!(beat[i + 1][1] - beat[i][1] < ONE_FOURTH_RHYTHM_COEFFICIENT / beat[i][9] + 0.008 && beat[i + 1][1] - beat[i][1] > 0.008 && beat[i + 1][0] != beat[i][0]) && on_stream) {
+			if (!(in_range(gap, 0.23, 0.27)
+				&& beat[i + 1][1] - beat[i][1] > 0.008
+				&& beat[i + 1][0] != beat[i][0]
+				&& beat[i - 1][0] != beat[i][0])
+				&& on_stream) {
 				on_stream = false;
 				to_color.push([i, 'stream_end']);
 			}  // not within 1/4 rhythm of next note + 4ms, not in the same position, currently in stream. must be end of stream
@@ -234,6 +249,17 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 
 			}
 
+		}
+
+
+		// THIRD
+		if (in_range(gap, 0.31, 0.34) || in_range(gap, 0.145, 0.175)) {
+			to_color.push([i, 'third']);
+		}
+
+		// EIGHTH
+		if (in_range(gap, 0.11, 0.135)) {
+			to_color.push([i, 'eighth']);
 		}
 
 
@@ -268,42 +294,46 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	let hsv_jack = hex_to_hsv(hex_jack);
 	let hsv_stream = hex_to_hsv(hex_stream);
 	let hsv_stream_end = hex_to_hsv(hex_stream_end);
+	let hsv_third = hex_to_hsv(hex_third);
+	let hsv_eighth = hex_to_hsv(hex_eighth);
 
 	console.log(to_color);
 
 	if (hsv_stream_end == undefined) {
-		hsv_stream_end = hsv_stream;
+		hsv_stream_end = hsv_default;
 	}
 
 	if (hsv_default != undefined) {
-		beat.map(element => {
-			element[11] = hsv_default.h;
-			element[16] = hsv_default.s;
-			element[17] = hsv_default.v;
-		})
+		for (i = timestamp_index[0]; i < timestamp_index[1]; i++) {
+			set_object_color(beat, i, hsv_default);
+		}
 	}
 
-	console.log(hsv_2chord);
 	to_color.map(element => {
 
 		switch (element[1]) {
 			case 'chord':
 				if (element[2] == 2) {
-					set_object_color(beat, element, hsv_2chord);
+					set_object_color(beat, element[0], hsv_2chord);
 				} else if (element[2] >= 3) {
-					set_object_color(beat, element, hsv_3chord);
+					set_object_color(beat, element[0], hsv_3chord);
 				}
 				break
 			case 'jack':
-				set_object_color(beat, element, hsv_jack);
+				set_object_color(beat, element[0], hsv_jack);
 				break
 			case 'stream':
-				set_object_color(beat, element, hsv_stream);
+				set_object_color(beat, element[0], hsv_stream);
 				break
 			case 'stream_end':
-				set_object_color(beat, element, hsv_stream_end);
+				set_object_color(beat, element[0], hsv_stream_end);
 				break
-
+			case 'third':
+				set_object_color(beat, element[0], hsv_third);
+				break
+			case 'eighth':
+				set_object_color(beat, element[0], hsv_eighth);
+				break
 		}
 	})
 
@@ -313,11 +343,11 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 }
 
 
-function set_object_color(beat, element, hsv) {  // element refers to elements in to_color, where element[0] indicates the index of the object in beat
+function set_object_color(beat, index, hsv) {
 	if (hsv != undefined) {
-		beat[element[0]][11] = hsv.h;
-		beat[element[0]][16] = hsv.s;
-		beat[element[0]][17] = hsv.v;
+		beat[index][11] = hsv.h;
+		beat[index][16] = hsv.s;
+		beat[index][17] = hsv.v;
 	}
 }
 
@@ -350,6 +380,10 @@ function transition(item) {
 			document.getElementById(element).style.display = 'flex';
 		}
 	})
+
+	if (document.getElementById(item).offsetHeight > window.innerHeight) {
+		document.getElementById(item).style.alignSelf = 'flex-start';
+	}
 }
 
 // document.onload = transition(blank);
@@ -357,3 +391,4 @@ function transition(item) {
 // $(document).on('change', 'input[type=color]', function() {
 // 	this.parentNode.style.backgroundColor = this.value;
 // });
+
