@@ -45,7 +45,8 @@ h2 {
 
 
 input[type='color'] {
-	width: calc(100% - 12px);
+/* 	width: calc(100% - 12px); */
+	width: 108px;
 	height: 27px;
 	margin-top: 3px;
 	background-color: black !important;
@@ -224,6 +225,7 @@ a:hover {
 	display: none;
 }
 
+/* COLORING */
 
 .inline-container {
 	display: flex;
@@ -231,6 +233,30 @@ a:hover {
 }
 
 .inline-container > div {
-	width: 120px;
+/* 	width: 120px; */
+	margin-right: 8px;
+}
+
+.inline-container > .horizontal-input {
+	width: auto;
 /* 	margin-right: 10px; */
+}
+
+#length_specific_hold {
+	width: 50px;
+	margin-left: 3px;
+}
+
+.horizontal-input {
+	position: relative;
+	bottom: 3px;
+}
+
+#save {
+	background-color: #6d6882;
+	margin-top: 5px;
+}
+
+#save:active {
+	background-color: #514d60;
 }
