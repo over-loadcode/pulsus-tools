@@ -189,17 +189,17 @@ function what_color(beat, i) {
 	if (is_double_bpm.checked) {
 		ONE_FOURTH_GAP_COEFFICIENT = 0.5;
 	}
-	
-	
+
+
 	gap = Math.abs((beat[i + 1][1] - beat[i][1]) * beat[i][9] * 0.008333);  // fraction of a beat, e.g. 1/4 gap is 0.25
 
 	// CHORD
 	if (gap < 0.001) {
 		let j = 1;
-		
+
 		gap = Math.abs((beat[i + j + 1][1] - beat[i + j][1]) * beat[i][9] * 0.008333);
 		while (beat[i + j + 1][1] - beat[i + j][1] < 0.001) { j++; } // start at i+1, increment until next object not on same tick. j+i will be the last note of the chord, and j+1 will be the number of notes in a chord
-		
+
 		return ['chord', j];
 	}
 
@@ -218,17 +218,17 @@ function what_color(beat, i) {
 	}
 
 	// 1/3 AND 1/6
-	if (in_range(gap, 0.32, 0.34) || in_range(gap, 0.145, 0.175)) {
+	if (in_range(gap, 0.32, 0.34) || in_range(gap, 0.145, 0.175) || in_range(gap, 0.65, 0.67)) {
 		return 'third';
 	}
-	
+
 	// JACK
 	if (gap < 0.26 * ONE_FOURTH_GAP_COEFFICIENT && beat[i + 1][0] == beat[i][0]) {  // beat[i][0] is position
-		
+
 		let j = 1;
 		gap = Math.abs((beat[i + j + 1][1] - beat[i + j][1]) * beat[i][9] * 0.008333);
-		while (in_range(gap, 0.25 * ONE_FOURTH_GAP_COEFFICIENT - 0.001, 0.25 * ONE_FOURTH_GAP_COEFFICIENT + 0.001)&& beat[i + j + 1][0] == beat[i + j][0]) { j++; }
-		
+		while (in_range(gap, 0.25 * ONE_FOURTH_GAP_COEFFICIENT - 0.001, 0.25 * ONE_FOURTH_GAP_COEFFICIENT + 0.001) && beat[i + j + 1][0] == beat[i + j][0]) { j++; }
+
 		return ['jack', j];
 	}
 
@@ -243,8 +243,8 @@ function what_color(beat, i) {
 	}
 
 	return 'default';
-	
-} 
+
+}
 
 
 // COLORING
@@ -276,16 +276,16 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	if (hex_anchor_hold === 'undefined') { hex_anchor_hold = hex_hold; }
 	if (hex_disconnected_hold === 'undefined') { hex_disconnected_hold = hex_hold; }
 	if (hex_specific_hold === 'undefined') { hex_specific_hold = hex_hold; }
-	
+
 
 	var color;
 	for (i = timestamp_index[0]; i < timestamp_index[1] - 1; i++) {
 
 		color = what_color(beat, i);
 		console.log(color);
-		
+
 		if (color.constructor === Array) {
-			
+
 			switch (color[0]) {
 				case 'chord':
 					for (idx = i; idx <= i + color[1]; idx++) {  // color[1] is the length of the chord not including the first note
@@ -301,14 +301,14 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 						set_object_color(beat, idx, hsv_jack, hsv_default);
 					}
 					break
-					
+
 			}
 
 			i += color[1];  // array is for object types where coloring spans several notes
-			
+
 		} else {
-			
-			switch (color) {	
+
+			switch (color) {
 				case 'fourth':
 					set_object_color(beat, i, hsv_stream, hsv_default);
 					break
@@ -334,7 +334,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 					set_object_color(beat, i, hsv_default);
 					break
 			}
-			
+
 		}
 
 	}
@@ -344,8 +344,8 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	} else {
 		set_object_color(beat, timestamp_index[1] - 1, hsv_default);
 	}
-	
-	
+
+
 	let output = JSON.stringify(beat);
 	document.getElementById('color_output').innerHTML = output;
 
@@ -353,7 +353,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 
 
 function set_object_color(beat, index, hsv, hsv_default) {
-	
+
 	if (hsv != undefined) {
 		beat[index][11] = hsv.h;
 		beat[index][16] = hsv.s;
@@ -363,7 +363,7 @@ function set_object_color(beat, index, hsv, hsv_default) {
 		beat[index][16] = hsv_default.s;
 		beat[index][17] = hsv_default.v;
 	}
-	
+
 }
 
 
@@ -377,17 +377,17 @@ function setCookie(name, value) {
 
 // SAVE PRESET (COLOR)
 function save_preset() {
-	
+
 	var color_inputs = document.querySelectorAll('input[type="color"]');
 	color_inputs.forEach(element => { setCookie(element.id, element.value.slice(1)); });
 	console.log(document.cookie);
-	
+
 }
 
 
 // DELETE
 function delete_section(beat, timestamp_start, timestamp_end) {
-	
+
 	let setup_data = setup(beat, timestamp_start, timestamp_end);
 
 	beat = setup_data.beat;
@@ -402,12 +402,12 @@ function delete_section(beat, timestamp_start, timestamp_end) {
 
 	let output = JSON.stringify(beat);
 	document.getElementById('delete_output').innerHTML = output;
-	
+
 }
 
 
 function transition(item) {
-	
+
 	const tools = ['blank', 'horizontal-flip', 'color', 'delete'];
 	tools.forEach(element => {
 		if (element != item) {
@@ -420,7 +420,7 @@ function transition(item) {
 	if (document.getElementById(item).offsetHeight > window.innerHeight) {
 		document.getElementById(item).style.alignSelf = 'flex-start';
 	}
-	
+
 }
 
 
@@ -429,19 +429,19 @@ function getCookie(cname) {  // taken from W3schools lol
 	let name = cname + "=";
 	let decodedCookie = decodeURIComponent(document.cookie);
 	let ca = decodedCookie.split(';');
-	
+
 	for (let i = 0; i < ca.length; i++) {
 		let c = ca[i];
 		while (c.charAt(0) == ' ') {
 			c = c.substring(1);
 		}
-		
+
 		if (c.indexOf(name) == 0) {
 			return c.substring(name.length, c.length);
 		}
 	}
 	return "";
-	
+
 }
 
 // $(document).on('change', 'input[type=color]', function() {
@@ -454,7 +454,7 @@ function document_setup() {
 	color_inputs.forEach(element => {
 		document.getElementById(element.id).value = '#' + getCookie(element.id);
 	})
-	
+
 }
 
 document.onload = document_setup();
