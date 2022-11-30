@@ -135,6 +135,11 @@
 							</div>
 
 							<div>
+								<p><label for='chord_hold'>Chord holds:</label></p>
+								<input type='color' id='color_chord_hold' name='chord_hold'>
+							</div>
+							
+							<div>
 								<p><label for='anchor_hold'>Anchor holds:</label></p>
 								<input type='color' id='color_anchor_hold' name='anchor_hold'>
 							</div>
@@ -168,7 +173,8 @@
 							document.getElementById('color_hold').value,
 							document.getElementById('color_anchor_hold').value,
 							document.getElementById('color_disconnected_hold').value,
-							document.getElementById('color_specific_hold').value)">ADD
+							document.getElementById('color_specific_hold').value,
+							document.getElementById('color_chord_hold').value)">ADD
 							COLOR</button>
 
 						<button type='button' id='save'
