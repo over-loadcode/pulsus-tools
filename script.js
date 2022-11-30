@@ -180,10 +180,10 @@ function in_range(x, min, max) {
 }
 
 
+const is_double_bpm = document.getElementById('is_double_bpm');
+const specific_hold_length = parseFloat(document.getElementById('length_specific_hold').value);
 function what_color(beat, i) {
 
-	const is_double_bpm = document.getElementById('is_double_bpm');
-	const specific_hold_length = parseFloat(document.getElementById('length_specific_hold').value);
 
 	let ONE_FOURTH_GAP_COEFFICIENT = 1;
 	if (is_double_bpm.checked) {
@@ -201,6 +201,7 @@ function what_color(beat, i) {
 		while (beat[i + j + 1][1] - beat[i + j][1] < 0.001) { j++; } // start at i+1, increment until next object not on same tick. j+i will be the last note of the chord, and j+1 will be the number of notes in a chord
 
 		return ['chord', j];
+
 	}
 
 	// HOLD
@@ -248,7 +249,7 @@ function what_color(beat, i) {
 
 
 // COLORING
-function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_third, hex_eighth, hex_hold, hex_anchor_hold, hex_disconnected_hold, hex_specific_hold) {
+function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_third, hex_eighth, hex_hold, hex_anchor_hold, hex_disconnected_hold, hex_specific_hold, hex_chord_hold) {
 
 
 	let setup_data = setup(beat, timestamp_start, timestamp_end);
@@ -256,6 +257,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	beat = setup_data.beat;
 	let timestamp_index = setup_data.timestamp_index;
 
+	beat.push([8, beat[beat.length - 1][1] + 1, false, 0, false, 0, 0.6741573033707865, 0, 0, 178, 64, 45, null, 0, 3, true, 0, 255]);  // inserting last note to not overflow and check index that doesn't exist
 	console.log(beat);
 
 
@@ -271,29 +273,46 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	let hsv_anchor_hold = hex_to_hsv(hex_anchor_hold);
 	let hsv_disconnected_hold = hex_to_hsv(hex_disconnected_hold);
 	let hsv_specific_hold = hex_to_hsv(hex_specific_hold);
+	let hsv_chord_hold = hex_to_hsv(hex_chord_hold);
 
-	if (hsv_3chord === 'undefined') { hsv_3chord = hsv_2chord; }
-	if (hex_anchor_hold === 'undefined') { hex_anchor_hold = hex_hold; }
-	if (hex_disconnected_hold === 'undefined') { hex_disconnected_hold = hex_hold; }
-	if (hex_specific_hold === 'undefined') { hex_specific_hold = hex_hold; }
+	if (hsv_3chord === undefined) { hsv_3chord = hsv_2chord; }
+	if (hsv_anchor_hold === undefined) { hsv_anchor_hold = hsv_hold; }
+	if (hsv_disconnected_hold === undefined) { hsv_disconnected_hold = hsv_hold; }
+	if (hsv_specific_hold === undefined) { hsv_specific_hold = hsv_hold; }
+	if (hsv_chord_hold === undefined) { hsv_chord_hold = hsv_hold; }
 
 
 	var color;
 	for (i = timestamp_index[0]; i < timestamp_index[1] - 1; i++) {
 
 		color = what_color(beat, i);
-		console.log(color);
+		// console.log(color);
 
 		if (color.constructor === Array) {
 
 			switch (color[0]) {
 				case 'chord':
 					for (idx = i; idx <= i + color[1]; idx++) {  // color[1] is the length of the chord not including the first note
-						if (color[1] == 1) {
+
+						gap = Math.abs((beat[i + color[1] + 1][1] - beat[i][1]) * beat[i][9] * 0.008333);
+						console.log(gap);
+						// console.log(i, idx);
+						if (beat[idx][5] == 1) {  // hold bypasses chords. i don't know how else to do this sorry
+							if (beat[idx][6] == specific_hold_length && hsv_specific_hold != hsv_hold) {
+								set_object_color(beat, idx, hsv_specific_hold, hsv_default);
+							} else if (beat[idx][6] > gap + 0.001 && hsv_anchor_hold != hsv_hold) {
+								set_object_color(beat, idx, hsv_anchor_hold, hsv_default);
+							} else if (beat[idx][6] < gap - 0.001 && hsv_disconnected_hold != hsv_hold) {
+								set_object_color(beat, idx, hsv_disconnected_hold, hsv_default);
+							} else {
+								set_object_color(beat, idx, hsv_chord_hold, hsv_default);
+							}
+						} else if (color[1] == 1) {
 							set_object_color(beat, idx, hsv_2chord, hsv_default);
 						} else {
 							set_object_color(beat, idx, hsv_3chord, hsv_default);
 						}
+
 					}
 					break
 				case 'jack':
@@ -339,11 +358,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 
 	}
 
-	if (beat[timestamp_index[1] - 1][5] == 1) {
-		set_object_color(beat, timestamp_index[1] - 1, hsv_disconnected_hold);
-	} else {
-		set_object_color(beat, timestamp_index[1] - 1, hsv_default);
-	}
+	beat.pop();  // remove note from earlier
 
 
 	let output = JSON.stringify(beat);
@@ -380,7 +395,7 @@ function save_preset() {
 
 	var color_inputs = document.querySelectorAll('input[type="color"]');
 	color_inputs.forEach(element => { setCookie(element.id, element.value.slice(1)); });
-	console.log(document.cookie);
+	// console.log(document.cookie);
 
 }
 
