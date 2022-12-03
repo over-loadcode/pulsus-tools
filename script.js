@@ -364,7 +364,7 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 
 
 	let output = JSON.stringify(beat);
-	document.getElementById('color_output').innerHTML = output;
+	document.getElementById('color_output').value = output;
 
 }
 
