@@ -252,6 +252,8 @@ function what_color(beat, i) {
 function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_third, hex_eighth, hex_hold, hex_anchor_hold, hex_disconnected_hold, hex_specific_hold, hex_chord_hold) {
 
 
+	document.getElementById('color_output').value = '';
+
 	let setup_data = setup(beat, timestamp_start, timestamp_end);
 
 	beat = setup_data.beat;
