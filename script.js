@@ -116,6 +116,8 @@ function flip(beat, timestamp_start, timestamp_end) {
 
 
 const hue_coefficient = 0.708333333; // 255/360
+const hue_coefficient_recip = 1.41176471; // 360/255
+
 function hex_to_hsv(hex) {
 
 	hex = hex.replace(/[^a-z0-9]/gi, '');
@@ -174,82 +176,120 @@ function hex_to_hsv(hex) {
 
 }
 
+function hsv_to_hex([h, s, v]) {
+
+	h = h*hue_coefficient_recip;
+	s = s/255;
+	v = v/255;
+
+	// console.log(h,s,v)
+	
+	let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);  // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately. ?????????????????????????????????
+	r = Math.round(f(5)*255);
+	g = Math.round(f(3)*255);
+	b = Math.round(f(1)*255);
+
+	// console.log(r, g, b);
+
+	var hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+	// console.log(hex);
+	return hex;
+
+}
+
 
 function in_range(x, min, max) {
 	return x >= min && x <= max;
 }
 
 
-const is_double_bpm = document.getElementById('is_double_bpm');
-const specific_hold_length = parseFloat(document.getElementById('length_specific_hold').value);
-function what_color(beat, i) {
+var specific_hold_length;
+function hold_type(hold_length, gap, bpm, default_type) {  // returns type of hold given hold length and time until next note
 
+	specific_hold_length = document.getElementById('length_specific_hold').value;  // it won't work if i set it outside the function idk why
+	hold_length = hold_length * bpm * 0.008333;
+	if (hold_length == specific_hold_length) {
+		return 'specific_hold';
+	}
+	if (hold_length > gap + 0.001) {
+		return 'anchor_hold';
+	}
+	if (hold_length < gap - 0.001) {
+		return 'disconnected_hold';
+		// console.log(hold_length, gap, default_type);
+	}
+	return default_type;
+
+}
+
+function get_gap(current_note, next_note) {  // fraction of a beat, e.g. 1/4 gap is 0.25
+
+	return Math.abs((next_note[1] - current_note[1]) * current_note[9] * 0.008333);
+
+}
+
+var to_color;  // format is [index, color]
+const is_double_bpm = document.getElementById('is_double_bpm');
+function find_color(beat, i) {
 
 	let ONE_FOURTH_GAP_COEFFICIENT = 1;
 	if (is_double_bpm.checked) {
 		ONE_FOURTH_GAP_COEFFICIENT = 0.5;
 	}
 
-
-	gap = Math.abs((beat[i + 1][1] - beat[i][1]) * beat[i][9] * 0.008333);  // fraction of a beat, e.g. 1/4 gap is 0.25
+	gap = get_gap(beat[i], beat[i + 1]);
 
 	// CHORD
 	if (gap < 0.001) {
-		let j = 1;
-
-		gap = Math.abs((beat[i + j + 1][1] - beat[i + j][1]) * beat[i][9] * 0.008333);
-		while (beat[i + j + 1][1] - beat[i + j][1] < 0.001) { j++; } // start at i+1, increment until next object not on same tick. j+i will be the last note of the chord, and j+1 will be the number of notes in a chord
-
-		return ['chord', j];
+		
+		j = 1;
+		while (beat[i + j + 1][1] - beat[i + j][1] < 0.001) { j++; }  // start at i+1, increment until next object not on same tick. j+i will be the last note of the chord, and j+1 will be the number of notes in a chord
+		return j + i;
 
 	}
 
 	// HOLD
 	if (beat[i][5] == 1) {
-		if (beat[i][6] == specific_hold_length) {
-			return 'specific_hold';
-		}
-		if (beat[i][6] > gap + 0.001) {
-			return 'anchor_hold';
-		}
-		if (beat[i][6] < gap - 0.001) {
-			return 'disconnected_hold';
-		}
-		return 'hold';
+		to_color.push([i, hold_type(beat[i][6], gap, beat[i][9], 'hold')]);
+		return;
 	}
 
 	// 1/3 AND 1/6
 	if (in_range(gap, 0.32, 0.34) || in_range(gap, 0.145, 0.175) || in_range(gap, 0.65, 0.67)) {
-		return 'third';
+		to_color.push([i, 'third']);
+		return;
 	}
 
 	// JACK
 	if (gap < 0.26 * ONE_FOURTH_GAP_COEFFICIENT && beat[i + 1][0] == beat[i][0]) {  // beat[i][0] is position
 
-		let j = 1;
-		gap = Math.abs((beat[i + j + 1][1] - beat[i + j][1]) * beat[i][9] * 0.008333);
-		while (in_range(gap, 0.25 * ONE_FOURTH_GAP_COEFFICIENT - 0.001, 0.25 * ONE_FOURTH_GAP_COEFFICIENT + 0.001) && beat[i + j + 1][0] == beat[i + j][0]) { j++; }
+		to_color.push([i, 'jack']);
+		to_color.push([i + 1, 'jack']);
+		return;
 
-		return ['jack', j];
 	}
 
 	// 1/4
 	if (in_range(gap, 0.24 * ONE_FOURTH_GAP_COEFFICIENT, 0.26 * ONE_FOURTH_GAP_COEFFICIENT)) {
-		return 'fourth';
+		to_color.push([i, 'fourth']);
+		return;
 	}
 
 	// 1/8
 	if (in_range(gap, 0.122 * ONE_FOURTH_GAP_COEFFICIENT, 0.127 * ONE_FOURTH_GAP_COEFFICIENT)) {
-		return 'eighth';
+		to_color.push([i, 'eighth']);
+		return;
 	}
 
-	return 'default';
+	to_color.push([i, 'default']);
+	return;
 
 }
 
 
 // COLORING
-function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, hex_3chord, hex_jack, hex_stream, hex_third, hex_eighth, hex_hold, hex_anchor_hold, hex_disconnected_hold, hex_specific_hold, hex_chord_hold) {
+function color(beat, timestamp_start, timestamp_end) {
 
 
 	document.getElementById('color_output').value = '';
@@ -260,105 +300,53 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 	let timestamp_index = setup_data.timestamp_index;
 
 	beat.push([8, beat[beat.length - 1][1] + 1, false, 0, false, 0, 0.6741573033707865, 0, 0, 178, 64, 45, null, 0, 3, true, 0, 255]);  // inserting last note to not overflow and check index that doesn't exist
-	console.log(beat);
+	// console.log(beat);
 
+	to_color = [];
+	var color_inputs = document.querySelectorAll('input[type="color"]');
+	var colors = {};
 
-	// i will change this eventually maybe??
-	let hsv_default = hex_to_hsv(hex_default);
-	let hsv_2chord = hex_to_hsv(hex_2chord);
-	let hsv_3chord = hex_to_hsv(hex_3chord);
-	let hsv_jack = hex_to_hsv(hex_jack);
-	let hsv_stream = hex_to_hsv(hex_stream);
-	let hsv_third = hex_to_hsv(hex_third);
-	let hsv_eighth = hex_to_hsv(hex_eighth);
-	let hsv_hold = hex_to_hsv(hex_hold);
-	let hsv_anchor_hold = hex_to_hsv(hex_anchor_hold);
-	let hsv_disconnected_hold = hex_to_hsv(hex_disconnected_hold);
-	let hsv_specific_hold = hex_to_hsv(hex_specific_hold);
-	let hsv_chord_hold = hex_to_hsv(hex_chord_hold);
+	color_inputs.forEach(element => {
+		colors[element.id.substring(6)] = hex_to_hsv(element.value);
+	});
 
-	if (hsv_3chord === undefined) { hsv_3chord = hsv_2chord; }
-	if (hsv_anchor_hold === undefined) { hsv_anchor_hold = hsv_hold; }
-	if (hsv_disconnected_hold === undefined) { hsv_disconnected_hold = hsv_hold; }
-	if (hsv_specific_hold === undefined) { hsv_specific_hold = hsv_hold; }
-	if (hsv_chord_hold === undefined) { hsv_chord_hold = hsv_hold; }
-
+	if (colors['3chord'] === undefined) { colors['3chord'] = colors['2chord']; }
+	if (colors.anchor_hold === undefined) { colors.anchor_hold = colors.hold; }
+	if (colors.disconnected_hold === undefined) { colors.disconnected_hold = colors.hold; }
+	if (colors.specific_hold === undefined) { colors.specific_hold = colors.hold; }
+	if (colors.chord_hold === undefined) { colors.chord_hold = colors.hold; }
 
 	var color;
 	for (i = timestamp_index[0]; i < timestamp_index[1] - 1; i++) {
 
-		color = what_color(beat, i);
-		// console.log(color);
-
-		if (color.constructor === Array) {
-
-			switch (color[0]) {
-				case 'chord':
-					for (idx = i; idx <= i + color[1]; idx++) {  // color[1] is the length of the chord not including the first note
-
-						gap = Math.abs((beat[i + color[1] + 1][1] - beat[i][1]) * beat[i][9] * 0.008333);
-						console.log(gap);
-						// console.log(i, idx);
-						if (beat[idx][5] == 1) {  // hold bypasses chords. i don't know how else to do this sorry
-							if (beat[idx][6] == specific_hold_length && hsv_specific_hold != hsv_hold) {
-								set_object_color(beat, idx, hsv_specific_hold, hsv_default);
-							} else if (beat[idx][6] > gap + 0.001 && hsv_anchor_hold != hsv_hold) {
-								set_object_color(beat, idx, hsv_anchor_hold, hsv_default);
-							} else if (beat[idx][6] < gap - 0.001 && hsv_disconnected_hold != hsv_hold) {
-								set_object_color(beat, idx, hsv_disconnected_hold, hsv_default);
-							} else {
-								set_object_color(beat, idx, hsv_chord_hold, hsv_default);
-							}
-						} else if (color[1] == 1) {
-							set_object_color(beat, idx, hsv_2chord, hsv_default);
-						} else {
-							set_object_color(beat, idx, hsv_3chord, hsv_default);
-						}
-
-					}
-					break
-				case 'jack':
-					for (idx = i; idx <= i + color[1]; idx++) {  // color[1] is the length of the chord not including the first note
-						set_object_color(beat, idx, hsv_jack, hsv_default);
-					}
-					break
-
+		color = find_color(beat, i);
+		if (color != undefined) {  // chord
+			for (j = i; j <= color; j++) {
+				if (beat[i][5] == 1) {
+					// console.log(beat[i]);
+					gap = get_gap(beat[color], beat[color + 1]);
+					to_color.push([i, hold_type(beat[i][6], gap, beat[i][9], 'chord_hold')]);
+				} else if (color - i > 1) {
+					to_color.push([j, '3chord']);
+				} else {
+					to_color.push([j, '2chord']);
+				}
 			}
-
-			i += color[1];  // array is for object types where coloring spans several notes
-
-		} else {
-
-			switch (color) {
-				case 'fourth':
-					set_object_color(beat, i, hsv_stream, hsv_default);
-					break
-				case 'third':
-					set_object_color(beat, i, hsv_third, hsv_default);
-					break
-				case 'eighth':
-					set_object_color(beat, i, hsv_eighth, hsv_default);
-					break
-				case 'hold':
-					set_object_color(beat, i, hsv_hold, hsv_default);
-					break
-				case 'anchor_hold':
-					set_object_color(beat, i, hsv_anchor_hold, hsv_default);
-					break
-				case 'disconnected_hold':
-					set_object_color(beat, i, hsv_disconnected_hold, hsv_default);
-					break
-				case 'specific_hold':
-					set_object_color(beat, i, hsv_specific_hold, hsv_default);
-					break
-				case 'default':
-					set_object_color(beat, i, hsv_default);
-					break
-			}
-
+			i = j - 1;
 		}
 
 	}
+
+	var current_color;
+	to_color.forEach(element => {
+
+		current_color = colors[element[1]];
+		set_object_color(beat, element[0], current_color, colors.default, colors.excluded);
+
+	})
+	// console.log(colors);
+	// console.log(to_color);
+
 
 	beat.pop();  // remove note from earlier
 
@@ -369,7 +357,111 @@ function color(beat, timestamp_start, timestamp_end, hex_default, hex_2chord, he
 }
 
 
-function set_object_color(beat, index, hsv, hsv_default) {
+function grab_colors(beat, timestamp_start, timestamp_end) {
+
+	document.getElementById('color_output').value = '';
+
+	let setup_data = setup(beat, timestamp_start, timestamp_end);
+
+	beat = setup_data.beat;
+	let timestamp_index = setup_data.timestamp_index;
+
+	// console.log(beat);
+
+	// inserting last note to not overflow and check index that doesn't exist
+	if (beat[beat.length - 1][5] == 1) {
+		beat.push([8, beat[beat.length - 1][1] + beat[beat.length - 1][6], false, 0, false, 0, 0.6741573033707865, 0, 0, 178, 64, 45, null, 0, 3, true, 0, 255]);
+	} else {
+		beat.push([8, beat[beat.length - 1][1] + 1, false, 0, false, 0, 0.6741573033707865, 0, 0, 178, 64, 45, null, 0, 3, true, 0, 255]);
+	}
+
+	to_color = [];
+
+
+	var color;
+	for (i = timestamp_index[0]; i < timestamp_index[1] - 1; i++) {
+
+		color = find_color(beat, i);
+		if (color != undefined) {  // chord
+			for (j = i; j <= color; j++) {
+				if (beat[i][5] == 1) {
+					gap = get_gap(beat[color], beat[color + 1]);
+					to_color.push([i, hold_type(beat[i][6], gap, beat[i][9], 'chord_hold')]);
+				} else if (color - i > 1) {
+					to_color.push([j, '3chord']);
+				} else {
+					to_color.push([j, '2chord']);
+				}
+			}
+			i = j - 1;
+		}
+
+	}
+
+
+	// console.log(to_color);
+
+	var color_inputs = document.querySelectorAll('input[type="color"]');
+	var counts = {};
+
+	var hsv;
+	var type;
+	to_color.forEach(element => {
+
+		hsv = `${beat[element[0]][11]},${beat[element[0]][16]},${beat[element[0]][17]}`
+
+		type = element[1];
+
+		if (!counts[type]) {  // if note type doesn't exist
+			counts[type] = {};
+		}
+
+		if (!counts[type][hsv]) {  // if count for that HSV doesn't exist
+			counts[type][hsv] = {
+				value: 0
+			};
+		}
+
+		counts[type][hsv].value++;
+		if (type == 'anchor_hold') {
+			// console.log(beat[element[0]]);
+		}
+
+	});
+
+	console.log(counts);
+
+	let to_update = [];
+	let push_hsv;
+	for (const type in counts) {
+		let most_frequent_hsv;
+		let highest_count = 0;
+		for (const hsv in counts[type]) {
+			// update current highest count if the hsv has a higher value
+			if (counts[type][hsv].value > highest_count) {
+				most_frequent_hsv = hsv;
+				highest_count = counts[type][hsv].value;
+			}
+		}
+		push_hsv = most_frequent_hsv.split(',').map(element => parseInt(element));
+		to_update.push([`color_${type}`, hsv_to_hex(push_hsv)]);
+	}
+	// console.log(to_update);
+
+	to_update.forEach(element => {
+		document.getElementById(element[0]).value = element[1];
+	})
+
+}
+
+
+function set_object_color(beat, index, hsv, hsv_default, hsv_excluded) {
+
+	if (hsv_excluded != undefined) {
+		if (beat[index][11] == hsv_excluded.h && beat[index][16] == hsv_excluded.s && beat[index][17] == hsv_excluded.v) {
+			return;
+		}
+	}
 
 	if (hsv != undefined) {
 		beat[index][11] = hsv.h;
@@ -436,6 +528,7 @@ function transition(item) {
 
 	if (document.getElementById(item).offsetHeight > window.innerHeight) {
 		document.getElementById(item).style.alignSelf = 'flex-start';
+		// console.log('sdfsdf');
 	}
 
 }
