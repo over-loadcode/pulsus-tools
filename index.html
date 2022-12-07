@@ -101,12 +101,12 @@
 
 							<div>
 								<p><label for='hex_chord'>2chords:</label></p>
-								<input type='color' id='color_hex_2chord' name='hex_chord'>
+								<input type='color' id='color_2chord' name='hex_chord'>
 							</div>
 
 							<div>
 								<p><label for='hex_chord'>3+chords:</label></p>
-								<input type='color' id='color_hex_3chord' name='hex_chord'>
+								<input type='color' id='color_3chord' name='hex_chord'>
 							</div>
 
 							<div>
@@ -115,8 +115,8 @@
 							</div>
 
 							<div>
-								<p><label for='stream'>1/4:</label></p>
-								<input type='color' id='color_stream' name='stream'>
+								<p><label for='fourth'>1/4:</label></p>
+								<input type='color' id='color_fourth' name='stream'>
 							</div>
 
 							<div>
@@ -138,7 +138,7 @@
 								<p><label for='chord_hold'>Chord holds:</label></p>
 								<input type='color' id='color_chord_hold' name='chord_hold'>
 							</div>
-							
+
 							<div>
 								<p><label for='anchor_hold'>Anchor holds:</label></p>
 								<input type='color' id='color_anchor_hold' name='anchor_hold'>
@@ -149,36 +149,35 @@
 								<input type='color' id='color_disconnected_hold' name='disconnected_hold'>
 							</div>
 
-							<br><div class='horizontal-input'>
+							<div class='horizontal-input'>
 								<p><label for='specific_hold'>Specific hold length (decimal):</label>
-								<input type='text' id='length_specific_hold' name='specific_hold'></p>
+									<input type='text' id='length_specific_hold' name='specific_hold'>
+								</p>
 								<input type='color' id='color_specific_hold' name='specific_hold'>
 							</div>
+
+							<div>
+								<p><label for='excluded'>Excluded color (hex):</label>
+									<input type='text' id='color_excluded' name='excluded'>
+								</p>
+							</div>
+
 						</div>
 
 						<p><label for='double_bpm'>Double BPM: </label><input type='checkbox' id='is_double_bpm'
 								name='double_bpm'></p>
 
-						<button type='button' id='submit'
-							onclick="color(document.getElementById('color_beat').value,
+						<button type='button' id='submit' onclick="color(document.getElementById('color_beat').value,
 							document.getElementById('color_timestamp_start').value,
-							document.getElementById('color_timestamp_end').value,
-							document.getElementById('color_default').value,
-							document.getElementById('color_hex_2chord').value,
-							document.getElementById('color_hex_3chord').value,
-							document.getElementById('color_jack').value,
-							document.getElementById('color_stream').value,
-							document.getElementById('color_third').value,
-							document.getElementById('color_eighth').value,
-							document.getElementById('color_hold').value,
-							document.getElementById('color_anchor_hold').value,
-							document.getElementById('color_disconnected_hold').value,
-							document.getElementById('color_specific_hold').value,
-							document.getElementById('color_chord_hold').value)">ADD
+							document.getElementById('color_timestamp_end').value);">ADD
 							COLOR</button>
 
-						<button type='button' id='save'
-							onclick="save_preset()">SAVE PRESET</button>
+						<button type='button' class='preset' onclick="save_preset();">SAVE PRESET</button>
+
+						<button type='button' class='preset' onclick="grab_colors(document.getElementById('color_beat').value,
+							document.getElementById('color_timestamp_start').value,
+							document.getElementById('color_timestamp_end').value);">GRAB COLORS FROM
+							ZT.BEAT</button>
 
 						<p><label for='output'>Output:</label></p>
 						<textarea id='color_output' name='output' rows=10 cols=50></textarea>
