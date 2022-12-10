@@ -216,8 +216,8 @@ function hold_type(hold_length, gap, bpm, default_type) {  // returns type of ho
 		return 'anchor_hold';
 	}
 	if (hold_length < gap - 0.001) {
+		console.log(hold_length, gap);
 		return 'disconnected_hold';
-		// console.log(hold_length, gap, default_type);
 	}
 	return default_type;
 
@@ -325,7 +325,7 @@ function color(beat, timestamp_start, timestamp_end) {
 				if (beat[j][5] == 1) {
 					// console.log(beat[i]);
 					gap = get_gap(beat[color], beat[color + 1]);
-					to_color.push([j, hold_type(beat[i][6], gap, beat[j][9], 'chord_hold')]);
+					to_color.push([j, hold_type(beat[j][6], gap, beat[j][9], 'chord_hold')]);
 				} else if (color - j > 1) {
 					to_color.push([j, '3chord']);
 				} else {
