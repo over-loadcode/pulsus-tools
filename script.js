@@ -178,16 +178,16 @@ function hex_to_hsv(hex) {
 
 function hsv_to_hex([h, s, v]) {
 
-	h = h*hue_coefficient_recip;
-	s = s/255;
-	v = v/255;
+	h = h * hue_coefficient_recip;
+	s = s / 255;
+	v = v / 255;
 
 	// console.log(h,s,v)
-	
-	let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);  // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately. ?????????????????????????????????
-	r = Math.round(f(5)*255);
-	g = Math.round(f(3)*255);
-	b = Math.round(f(1)*255);
+
+	let f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);  // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately. ?????????????????????????????????
+	r = Math.round(f(5) * 255);
+	g = Math.round(f(3) * 255);
+	b = Math.round(f(1) * 255);
 
 	// console.log(r, g, b);
 
@@ -242,7 +242,7 @@ function find_color(beat, i) {
 
 	// CHORD
 	if (gap < 0.001) {
-		
+
 		j = 1;
 		while (beat[i + j + 1][1] - beat[i + j][1] < 0.001) { j++; }  // start at i+1, increment until next object not on same tick. j+i will be the last note of the chord, and j+1 will be the number of notes in a chord
 		return j + i;
@@ -322,11 +322,11 @@ function color(beat, timestamp_start, timestamp_end) {
 		color = find_color(beat, i);
 		if (color != undefined) {  // chord
 			for (j = i; j <= color; j++) {
-				if (beat[i][5] == 1) {
+				if (beat[j][5] == 1) {
 					// console.log(beat[i]);
 					gap = get_gap(beat[color], beat[color + 1]);
-					to_color.push([i, hold_type(beat[i][6], gap, beat[i][9], 'chord_hold')]);
-				} else if (color - i > 1) {
+					to_color.push([j, hold_type(beat[i][6], gap, beat[j][9], 'chord_hold')]);
+				} else if (color - j > 1) {
 					to_color.push([j, '3chord']);
 				} else {
 					to_color.push([j, '2chord']);
@@ -344,8 +344,8 @@ function color(beat, timestamp_start, timestamp_end) {
 		set_object_color(beat, element[0], current_color, colors.default, colors.excluded);
 
 	})
-	// console.log(colors);
-	// console.log(to_color);
+	console.log(colors);
+	console.log(to_color);
 
 
 	beat.pop();  // remove note from earlier
@@ -384,9 +384,9 @@ function grab_colors(beat, timestamp_start, timestamp_end) {
 		color = find_color(beat, i);
 		if (color != undefined) {  // chord
 			for (j = i; j <= color; j++) {
-				if (beat[i][5] == 1) {
+				if (beat[j][5] == 1) {
 					gap = get_gap(beat[color], beat[color + 1]);
-					to_color.push([i, hold_type(beat[i][6], gap, beat[i][9], 'chord_hold')]);
+					to_color.push([j, hold_type(beat[j][6], gap, beat[j][9], 'chord_hold')]);
 				} else if (color - i > 1) {
 					to_color.push([j, '3chord']);
 				} else {
